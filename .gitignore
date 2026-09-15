@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Environment & Config
+.env
+.env.local
+
+# ML Weights & Datasets
+weights/*.pt
+weights/*.t7
+weights/*.pth
+!weights/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
+data/outputs/*
+!data/outputs/.gitkeep
+data/results/*
+!data/results/.gitkeep
+data/mot17/*
+!data/mot17/.gitkeep
+data/*.avi
+data/*.mp4
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
