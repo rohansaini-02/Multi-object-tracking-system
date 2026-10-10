@@ -10,13 +10,13 @@ import JobHistory from './pages/JobHistory';
 import Login from './pages/Login';
 
 export default function App() {
-  const [activePage, setActivePage] = useState('command-center');
+  const [activePage, setActivePage] = useState('dashboard');
   const [selectedJobId, setSelectedJobId] = useState('job-101');
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState(null);
 
   const renderPage = () => {
     switch (activePage) {
-      case 'command-center':
+      case 'dashboard':
         return <CommandCenter setActivePage={setActivePage} setSelectedJobId={setSelectedJobId} />;
       case 'ingest':
       case 'upload':
@@ -27,7 +27,6 @@ export default function App() {
       case 'benchmark':
         return <MOT17Benchmark setActivePage={setActivePage} setSelectedJobId={setSelectedJobId} />;
       case 'history':
-      case 'dashboard':
         return <JobHistory setActivePage={setActivePage} setSelectedJobId={setSelectedJobId} />;
       case 'login':
         return <Login setActivePage={setActivePage} />;
@@ -35,10 +34,10 @@ export default function App() {
         return (
           <div className="glass-card" style={{ padding: '32px' }}>
             <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
-              Operational Configuration
+              Settings
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              System environment settings, GPU acceleration parameters, and API integration tokens.
+              System settings, hardware preferences, and API connections.
             </p>
             <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ padding: '16px', background: 'var(--bg-elevated)', borderRadius: '6px' }}>

@@ -6,7 +6,7 @@ export default function Login({ setActivePage }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (setActivePage) setActivePage('command-center');
+    if (setActivePage) setActivePage('dashboard');
   };
 
   return (
@@ -29,7 +29,7 @@ export default function Login({ setActivePage }) {
           }}>
             ⌖
           </div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>MOT Vision Authentication</h2>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>Sign In</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginTop: '4px' }}>
             Sign in to access tracking operation telemetry & models
           </p>
@@ -38,7 +38,7 @@ export default function Login({ setActivePage }) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-              OPERATOR EMAIL
+              EMAIL
             </label>
             <input
               type="email"
@@ -83,7 +83,7 @@ export default function Login({ setActivePage }) {
           </div>
 
           <button type="submit" className="btn btn-cyan" style={{ marginTop: '8px', padding: '12px', justifyContent: 'center' }}>
-            Authenticate Operator →
+            Sign In →
           </button>
         </form>
       </div>
