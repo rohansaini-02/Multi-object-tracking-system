@@ -13,12 +13,12 @@ import {
 
 export default function Sidebar({ activePage, setActivePage }) {
   const navItems = [
-    { id: 'command-center', label: 'Command Center', icon: LayoutDashboard },
-    { id: 'workspace', label: 'Detection Workspace', icon: Eye, star: true },
-    { id: 'ingest', label: 'Upload & Ingest', icon: UploadCloud },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'workspace', label: 'Tracking Viewer', icon: Eye, star: true },
+    { id: 'ingest', label: 'Upload Video', icon: UploadCloud },
     { id: 'benchmark', label: 'MOT17 Benchmark', icon: BarChart3 },
-    { id: 'history', label: 'Job History', icon: History, badge: '2' },
-    { id: 'config', label: 'Configuration', icon: Settings },
+    { id: 'history', label: 'History', icon: History, badge: '2' },
+    { id: 'config', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -85,7 +85,7 @@ export default function Sidebar({ activePage, setActivePage }) {
           letterSpacing: '0.12em',
           fontWeight: 600
         }}>
-          WORKSTATION CORE
+          MAIN MENU
         </div>
 
         {/* Navigation Items */}

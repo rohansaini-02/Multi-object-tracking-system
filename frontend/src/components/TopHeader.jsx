@@ -32,9 +32,9 @@ export default function TopHeader() {
     }}>
       {/* Left Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
-        <span className="font-mono" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>WORKSTATION</span>
+        <span className="font-mono" style={{ color: 'var(--text-muted)', letterSpacing: '0.05em' }}>HOME</span>
         <span style={{ color: 'var(--text-muted)' }}>/</span>
-        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Operational Suite</span>
+        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Tracking Dashboard</span>
       </div>
 
       {/* Right Telemetry Indicators */}
@@ -59,7 +59,7 @@ export default function TopHeader() {
             backgroundColor: 'var(--accent-emerald)',
             boxShadow: '0 0 6px var(--accent-emerald)'
           }}></span>
-          <span>SYSTEM ONLINE</span>
+          <span>CONNECTED</span>
           <span style={{ color: 'var(--text-muted)', margin: '0 2px' }}>|</span>
           <span style={{ color: 'var(--text-secondary)' }}>Backend v0.1.0</span>
         </div>
