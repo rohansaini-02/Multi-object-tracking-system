@@ -12,7 +12,7 @@ export default function JobHistory({ setActivePage, setSelectedJobId }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <div style={{ paddingBottom: '8px', borderBottom: '1px solid var(--border-subtle)' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-          Tracking Job Archive & History
+          Tracking History
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
           Historical record of all executed multi-object tracking inference runs.
@@ -27,7 +27,7 @@ export default function JobHistory({ setActivePage, setSelectedJobId }) {
               <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem' }}>VIDEO NAME</th>
               <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem' }}>STATUS</th>
               <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem' }}>EXECUTION DATE</th>
-              <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem' }}>TOTAL TRACKS</th>
+              <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem' }}>OBJECTS FOUND</th>
               <th className="font-mono" style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '0.7rem', textAlign: 'right' }}>ACTION</th>
             </tr>
           </thead>
@@ -49,7 +49,7 @@ export default function JobHistory({ setActivePage, setSelectedJobId }) {
                     }}
                     className="btn btn-cyan btn-sm"
                   >
-                    Inspect Run →
+                    View Results →
                   </button>
                 </td>
               </tr>

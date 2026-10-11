@@ -88,7 +88,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
           style={{ padding: '12px 24px', fontSize: '0.9rem' }}
         >
           <span style={{ fontSize: '1.1rem' }}>+</span>
-          <span>Track New Video</span>
+          <span>New Tracking Job</span>
         </button>
       </div>
 
@@ -111,7 +111,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             <span>3 active sequences</span>
-            <span style={{ color: 'var(--accent-cyan)' }}>Ingested</span>
+            <span style={{ color: 'var(--accent-cyan)' }}>Uploaded</span>
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
         <div className="glass-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
             <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', letterSpacing: '0.08em', fontWeight: 600 }}>
-              JOBS RUN
+              TRACKING RUNS
             </span>
             <span style={{ color: 'var(--accent-cyan)', fontSize: '1.1rem' }}>🔀</span>
           </div>
@@ -145,7 +145,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             <span>88.9% success rate</span>
-            <span style={{ color: 'var(--accent-emerald)' }}>Optimal</span>
+            <span style={{ color: 'var(--accent-emerald)' }}>Good</span>
           </div>
         </div>
 
@@ -161,8 +161,8 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
             1
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            <span>Out-of-memory error</span>
-            <span style={{ color: 'var(--accent-rose)' }}>CUDA OOM</span>
+            <span>Memory error</span>
+            <span style={{ color: 'var(--accent-rose)' }}>Memory Error</span>
           </div>
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button className="btn btn-secondary btn-sm">⚙ Filter</button>
-            <button className="btn btn-secondary btn-sm">↻ Sync</button>
+            <button className="btn btn-secondary btn-sm">↻ Refresh</button>
           </div>
         </div>
 
@@ -191,9 +191,9 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
                 <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>VIDEO NAME</th>
                 <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>STATUS</th>
                 <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>PROGRESS</th>
-                <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>TOTAL TRACKS</th>
+                <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>OBJECTS FOUND</th>
                 <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>SPEED</th>
-                <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>SUBMITTED</th>
+                <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em' }}>STARTED</th>
                 <th className="font-mono" style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.7rem', letterSpacing: '0.06em', textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -241,7 +241,7 @@ export default function CommandCenter({ setActivePage, setSelectedJobId }) {
                       className={job.status === 'COMPLETED' ? 'btn btn-cyan btn-sm' : job.status === 'PROCESSING' ? 'btn btn-outline-cyan btn-sm' : 'btn btn-secondary btn-sm'}
                       style={{ padding: '6px 14px' }}
                     >
-                      {job.status === 'COMPLETED' ? 'View Results →' : job.status === 'PROCESSING' ? 'View Live →' : 'View Error Log'}
+                      {job.status === 'COMPLETED' ? 'View Results →' : job.status === 'PROCESSING' ? 'View Progress →' : 'View Error Log'}
                     </button>
                   </td>
                 </tr>
