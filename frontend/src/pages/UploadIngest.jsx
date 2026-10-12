@@ -59,7 +59,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
       setActivePage('workspace');
     } catch (err) {
       setIsSubmitting(false);
-      alert('Error submitting tracking job: ' + err.message);
+      alert('Something went wrong: ' + err.message);
     }
   };
 
@@ -68,15 +68,15 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
       {/* Header */}
       <div style={{ paddingBottom: '8px', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', letterSpacing: '0.1em', fontWeight: 600 }}>
-          INGESTION & PIPELINE DISPATCH
+          UPLOAD & CONFIGURE
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            Video Asset & Inference Engine Setup
+            Upload Video & Configure Tracking
           </h1>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <span className="badge badge-cyan">Job Profile: Production-Realtime-v2</span>
-            <span className="badge badge-emerald">Cluster Ready</span>
+            <span className="badge badge-cyan">Mode: Real-Time Tracking</span>
+            <span className="badge badge-emerald">Ready</span>
           </div>
         </div>
       </div>
@@ -94,14 +94,14 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="badge badge-cyan font-mono" style={{ fontSize: '0.65rem' }}>STEP 01</span>
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                1. Video Source Asset
+                1. Select Video
               </h2>
             </div>
             <span className="badge badge-emerald">• Ready</span>
           </div>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-            Uploaded video feed staged and ready for deep learning inference analysis.
+            Your video is ready for tracking. You can replace it below.
           </p>
 
           {/* Video Preview Box */}
@@ -212,7 +212,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="badge badge-cyan font-mono" style={{ fontSize: '0.65rem' }}>STEP 02</span>
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                2. Pipeline Parameters
+                2. Tracking Settings
               </h2>
             </div>
             <span className="badge badge-cyan">YOLOv8 + DeepSORT</span>
@@ -226,7 +226,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', backgroundColor: 'var(--bg-elevated)', padding: '16px', borderRadius: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)' }}>
-                Confidence Threshold
+                Detection Sensitivity
               </label>
               <span className="font-mono" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>
                 {confThreshold.toFixed(2)} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ 1.00</span>
@@ -242,7 +242,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
               style={{ accentColor: 'var(--accent-cyan)', cursor: 'pointer', width: '100%' }}
             />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              Minimum detection confidence score to register an object bounding box.
+              Minimum detection confidence score to register an object bounding box. Higher values detect fewer objects but with more certainty.
             </span>
           </div>
 
@@ -317,7 +317,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
               <span style={{ color: 'var(--accent-emerald)' }}>⚡</span>
-              <span>Estimated processing rate: <strong>~30 FPS</strong></span>
+              <span>Estimated speed: <strong>~30 FPS</strong></span>
             </div>
             <span className="badge badge-emerald font-mono">EST: 85S</span>
           </div>
@@ -338,7 +338,7 @@ export default function UploadIngest({ setActivePage, setSelectedJobId, setUploa
             {isSubmitting ? (
               <span>⏳ Dispatching Job to Queue...</span>
             ) : (
-              <span>📡 Submit Tracking Job →</span>
+              <span>🚀 Start Tracking →</span>
             )}
           </button>
         </div>
