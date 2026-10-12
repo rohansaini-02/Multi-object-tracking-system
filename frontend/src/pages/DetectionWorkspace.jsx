@@ -150,7 +150,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         {/* Active Sequence Header */}
         <div>
           <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-            ACTIVE SEQUENCE
+            CURRENT VIDEO
           </div>
           <div className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>
             crossroad_traffic_cam_04.mp4
@@ -166,7 +166,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              DISPLAY OVERLAYS
+              SHOW ON VIDEO
             </span>
             <span className="badge badge-cyan font-mono" style={{ fontSize: '0.62rem' }}>4 Active</span>
           </div>
@@ -174,9 +174,9 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
               { id: 'boundingBoxes', label: 'Bounding Boxes', icon: '⊡' },
-              { id: 'trackIds', label: 'Track ID Labels', icon: '🏷️' },
+              { id: 'trackIds', label: 'Object ID Labels', icon: '🏷️' },
               { id: 'confidence', label: 'Confidence Scores', icon: '%' },
-              { id: 'trajectory', label: 'Trajectory History', icon: '📈' },
+              { id: 'trajectory', label: 'Motion Path', icon: '📈' },
             ].map((item) => (
               <label
                 key={item.id}
@@ -213,7 +213,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         {/* Object Classes Filter Chips */}
         <div>
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px' }}>
-            OBJECT CLASSES
+            OBJECT TYPES
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -259,20 +259,20 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         {/* Track States Footer */}
         <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
           <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-            TRACK STATES
+            TRACKING STATUS
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center' }}>
             <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '4px', padding: '6px' }}>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-emerald)' }}>18</div>
-              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-emerald)' }}>CONF</div>
+              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-emerald)' }}>ACTIVE</div>
             </div>
             <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '4px', padding: '6px' }}>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-amber)' }}>4</div>
-              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-amber)' }}>TENT</div>
+              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-amber)' }}>NEW</div>
             </div>
             <div style={{ backgroundColor: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', borderRadius: '4px', padding: '6px' }}>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-rose)' }}>3</div>
-              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-rose)' }}>DEL</div>
+              <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-rose)' }}>LOST</div>
             </div>
           </div>
         </div>
@@ -345,7 +345,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
                 boxShadow: '0 0 16px rgba(245, 158, 11, 0.5)',
                 zIndex: 10
               }}>
-                ⚡ YOLOv8 + DeepSORT Inference Running... Drawing Bounding Boxes & Tracking IDs
+                ⚡YOLOv8 + DeepSORT Processing video...Drawing Bounding Boxes & Tracking IDs
               </div>
             )}
 
@@ -473,7 +473,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
             }}>
               <div>2023-10-26 14:30:15.45 UTC</div>
               <div style={{ color: 'var(--accent-cyan)' }}>CAM_004 FRAME_012890.jpg</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.6rem' }}>CV BENCHMARK DATASET</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.6rem' }}>TRACKING PREVIEW</div>
             </div>
           </div>
         </div>
@@ -545,7 +545,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-              JOB SUMMARY
+              TRACKING SUMMARY
             </span>
             <span className="badge badge-emerald">• COMPLETED</span>
           </div>
@@ -555,13 +555,13 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
               <div className="font-mono" style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>
                 38
               </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>TOTAL UNIQUE TRACKS</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>OBJECTS TRACKED</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-emerald)' }}>
                 98.2%
               </div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>MOTA Est.</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Accuracy</div>
             </div>
           </div>
         </div>
@@ -571,7 +571,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         {/* Primary Export Artifacts Buttons */}
         <div>
           <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '8px', letterSpacing: '0.08em' }}>
-            EXPORT ARTIFACTS
+            DOWNLOAD RESULTS
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -580,14 +580,14 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
               className="btn btn-cyan"
               style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '10px' }}
             >
-              📥 Download Annotated Video .mp4
+              📥 Download Tracked Video
             </button>
             <button
               onClick={() => alert('Exporting MOT Results TXT file...')}
               className="btn btn-outline-cyan"
               style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '8px' }}
             >
-              📄 Export MOT Results .txt
+              📄 Download Tracking Data
             </button>
           </div>
         </div>
@@ -597,7 +597,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
         {/* Pipeline Hyperparameters */}
         <div>
           <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '8px', letterSpacing: '0.08em' }}>
-            PIPELINE HYPERPARAMETERS
+            TRACKING SETTINGS USED
           </div>
 
           <div className="font-mono" style={{
@@ -611,19 +611,19 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
             color: 'var(--text-secondary)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Detector:</span> <span style={{ color: 'var(--text-primary)' }}>yolov8m.pt</span>
+              <span>Model:</span> <span style={{ color: 'var(--text-primary)' }}>yolov8m.pt</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Conf Threshold:</span> <span style={{ color: 'var(--accent-cyan)' }}>0.50</span>
+              <span>Sensitivity:</span> <span style={{ color: 'var(--accent-cyan)' }}>0.50</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Max Cosine Dist:</span> <span style={{ color: 'var(--accent-cyan)' }}>0.20</span>
+              <span>Match Strictness:</span> <span style={{ color: 'var(--accent-cyan)' }}>0.20</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Max Age:</span> <span style={{ color: 'var(--text-primary)' }}>30 frames</span>
+              <span>Memory (frames):</span> <span style={{ color: 'var(--text-primary)' }}>30 frames</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>N Init:</span> <span style={{ color: 'var(--text-primary)' }}>3 frames</span>
+              <span>Min Detections:</span> <span style={{ color: 'var(--text-primary)' }}>3 frames</span>
             </div>
           </div>
         </div>
@@ -637,13 +637,13 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
           padding: '12px'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>ACTIVE TARGET</span>
+            <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>SELECTED OBJECT</span>
             <span className="badge badge-cyan">#104 • Confirmed</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem' }}>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>OBJECT CLASS</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>TYPE</div>
               <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Person</div>
             </div>
             <div>
@@ -655,7 +655,7 @@ export default function DetectionWorkspace({ selectedJobId, uploadedVideoUrl }) 
               <div className="font-mono" style={{ color: 'var(--text-secondary)' }}>142 frames (4.7s)</div>
             </div>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>MOTION STATE</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>STATUS</div>
               <div style={{ color: 'var(--accent-emerald)', fontWeight: 600 }}>Tracking Active</div>
             </div>
           </div>
