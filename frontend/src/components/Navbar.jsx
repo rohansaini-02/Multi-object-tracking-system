@@ -5,7 +5,7 @@ export default function Navbar({ activePage, setActivePage }) {
     { id: 'home', label: 'Home' },
     { id: 'upload', label: 'Upload & Track' },
     { id: 'results', label: 'Results' },
-    { id: 'benchmark', label: 'MOT17 Benchmark' },
+    { id: 'benchmark', label: 'MOT17 Benchmark Performance' },
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'login', label: 'Login' },
   ];

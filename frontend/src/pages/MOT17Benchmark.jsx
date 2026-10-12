@@ -66,7 +66,7 @@ export default function MOT17Benchmark({ setActivePage, setSelectedJobId }) {
       {/* Subtext & Header */}
       <div style={{ paddingBottom: '8px', borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="font-mono" style={{ fontSize: '0.68rem', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-          VALIDATION / STANDARDIZED BENCHMARK / MOT17 TRAIN-TEST SPLIT
+          PERFORMANCE / MOT17 BENCHMARK
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
           <div>
@@ -81,7 +81,7 @@ export default function MOT17Benchmark({ setActivePage, setSelectedJobId }) {
             <span className="badge badge-cyan font-mono" style={{ fontSize: '0.7rem' }}>
               EVAL ENGINE: py-motmetrics v1.4.3 • IOU THRESH 0.50
             </span>
-            <button className="btn btn-cyan btn-sm">▶ Run Batch Suite</button>
+            <button className="btn btn-cyan btn-sm">▶ Run All Tests</button>
           </div>
         </div>
       </div>
@@ -94,8 +94,8 @@ export default function MOT17Benchmark({ setActivePage, setSelectedJobId }) {
       }}>
         {[
           { label: 'MOTA', value: '74.8 %', sub: 'Multi-Object Tracking Accuracy', color: 'var(--accent-cyan)' },
-          { label: 'IDF1', value: '78.2 %', sub: 'Identification F1 Score', color: 'var(--accent-cyan)' },
-          { label: 'ID SWITCHES', value: '14', sub: 'Identity transitions across GT', color: 'var(--accent-amber)' },
+          { label: 'IDF1', value: '78.2 %', sub: 'Identity Matching Score', color: 'var(--accent-cyan)' },
+          { label: 'ID SWITCHES', value: '14', sub: 'Times an object\'s ID changed', color: 'var(--accent-amber)' },
           { label: 'PRECISION', value: '89.4 %', sub: 'Detection precision (TP/TP+FP)', color: 'var(--accent-emerald)' },
           { label: 'RECALL', value: '82.6 %', sub: 'Detection recall (TP/TP+FN)', color: 'var(--accent-emerald)' },
         ].map((m, idx) => (
@@ -119,13 +119,13 @@ export default function MOT17Benchmark({ setActivePage, setSelectedJobId }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>📊</span>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Sequence Benchmark Records
+              Test Video Results
             </h2>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Frame-level evaluation results on official public detector baselines
+              Detailed results for each test video sequence
             </span>
           </div>
-          <span className="badge badge-cyan">4 ACTIVE SEQUENCES</span>
+          <span className="badge badge-cyan">4 TEST VIDEOS</span>
         </div>
 
         {/* Table */}
