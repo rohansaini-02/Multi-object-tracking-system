@@ -86,8 +86,9 @@ class MOT17CropDataset(Dataset):
 
                     frame_idx = int(parts[0])
                     track_id = int(parts[1])
-                    top = float(parts[2])
-                    left = float(parts[3])
+                    # Standard MOT Challenge format: index 2 is bb_left (x), index 3 is bb_top (y)
+                    left = float(parts[2])
+                    top = float(parts[3])
                     width = float(parts[4])
                     height = float(parts[5])
                     mark = int(parts[6])  # 1 = consider, 0 = ignore
@@ -109,7 +110,7 @@ class MOT17CropDataset(Dataset):
                         current_label += 1
 
                     label = self._id_map[global_id]
-                    self.samples.append((img_path, top, left, width, height, label))
+                    self.samples.append((img_path, left, top, width, height, label))
 
         self.num_classes = current_label
 
@@ -117,7 +118,7 @@ class MOT17CropDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
-        img_path, top, left, width, height, label = self.samples[idx]
+        img_path, left, top, width, height, label = self.samples[idx]
 
         img = cv2.imread(img_path)
         if img is None:
@@ -125,10 +126,10 @@ class MOT17CropDataset(Dataset):
             return torch.zeros((3, self.crop_size[0], self.crop_size[1])), label
 
         h, w, _ = img.shape
-        x1 = max(0, int(round(top)))
-        y1 = max(0, int(round(left)))
-        x2 = min(w, int(round(top + width)))
-        y2 = min(h, int(round(left + height)))
+        x1 = max(0, int(round(left)))
+        y1 = max(0, int(round(top)))
+        x2 = min(w, int(round(left + width)))
+        y2 = min(h, int(round(top + height)))
 
         crop = img[y1:y2, x1:x2]
         if crop.size == 0:

@@ -15,6 +15,18 @@ from ml.tracker.matching import (
 )
 from ml.types import BoundingBox, Detection, TrackOutput, TrackState
 
+# Maximum (1 - IoU) spatial cost tolerated by the fallback spatial association stage.
+# A cost of 0.7 corresponds to the classic DeepSORT requirement that a detection
+# overlaps a predicted track box by at least 30%.
+DEFAULT_MAX_IOU_DISTANCE = 0.7
+
+# Number of consecutive missed frames a TENTATIVE track survives before it is
+# discarded. A tentative track holds a single observation, therefore its Kalman
+# velocity estimate is still zero and its predicted box does not move. Deleting
+# it on the very first miss would burn a brand new track id for an object that
+# was merely occluded for a single frame.
+DEFAULT_MAX_TENTATIVE_AGE = 3
+
 
 class Track:
     """A single object track state managed by Kalman Filter & Feature Gallery."""
@@ -29,6 +41,7 @@ class Track:
         feature: Optional[np.ndarray] = None,
         class_id: int = 0,
         confidence: float = 1.0,
+        max_tentative_age: int = DEFAULT_MAX_TENTATIVE_AGE,
     ):
         self.mean = mean
         self.covariance = covariance
@@ -43,6 +56,7 @@ class Track:
 
         self._n_init = n_init
         self._max_age = max_age
+        self._max_tentative_age = max_tentative_age
         self.class_id = class_id
         self.confidence = confidence
 
@@ -75,7 +89,12 @@ class Track:
     def mark_missed(self) -> None:
         """Mark track as missed in current frame."""
         if self.state == TrackState.TENTATIVE:
-            self.state = TrackState.DELETED
+            # A tentative track carries a single observation and no velocity
+            # estimate, so it needs several chances to be re-acquired before its
+            # identity is thrown away. Without this grace period every brief
+            # dropout mints a brand new track id.
+            if self.time_since_update > self._max_tentative_age:
+                self.state = TrackState.DELETED
         elif self.time_since_update > self._max_age:
             self.state = TrackState.DELETED
 
@@ -105,11 +124,15 @@ class DeepSortTracker:
         n_init: int = 3,
         reid_model_path: Optional[str] = None,
         device: Optional[str] = None,
+        max_iou_distance: float = DEFAULT_MAX_IOU_DISTANCE,
+        max_tentative_age: int = DEFAULT_MAX_TENTATIVE_AGE,
     ):
         self.max_cosine_distance = max_cosine_distance
         self.nn_budget = nn_budget
         self.max_age = max_age
         self.n_init = n_init
+        self.max_iou_distance = max_iou_distance
+        self.max_tentative_age = max_tentative_age
 
         self.kf = KalmanFilter()
         self.reid_extractor = ReidFeatureExtractor(
@@ -177,16 +200,56 @@ class DeepSortTracker:
     def _match(
         self, detections: List[Detection]
     ) -> Tuple[List[Tuple[int, int]], List[int], List[int]]:
-        """Perform two-stage matching: (1) Cascaded cosine matching for confirmed tracks, (2) IoU matching for remaining."""
+        """Associate tracks with detections using three ordered stages.
+
+        1. **Cascaded appearance matching** for confirmed tracks (classic DeepSORT).
+           Tracks are served newest-first so a well-established identity never
+           loses its detection to a younger track.
+        2. **Spatial (IoU) matching** for every track the cascade could not place,
+           confirmed or tentative.
+        3. **Appearance matching** for the tentative tracks stage 2 could not place.
+           A tentative track holds a single observation, so its Kalman velocity
+           estimate is still zero and its predicted box does not move; the IoU
+           gate of stage 2 therefore rejects any object that moves faster than
+           roughly a third of its own box size. Appearance is motion invariant,
+           so it re-establishes the identity in exactly that case and stops the
+           tracker from minting a brand new id on every single frame.
+        """
         confirmed_tracks = [
             i for i, t in enumerate(self.tracks) if t.is_confirmed()
         ]
-        unconfirmed_tracks = [
-            i for i, t in enumerate(self.tracks) if not t.is_confirmed()
+        tentative_tracks = [
+            i for i, t in enumerate(self.tracks) if t.is_tentative()
         ]
 
         # Stage 1: Cascaded matching on confirmed tracks using appearance features
-        matches_a, unmatched_tracks_a, unmatched_detections = matching_cascade(
+        matches_a, unmatched_tracks_a, unmatched_detections = self._match_by_cascade(
+            detections, confirmed_tracks
+        )
+
+        # Stage 2: IoU matching for unconfirmed tracks & unmatched confirmed tracks
+        matches_b, unmatched_tracks_b, unmatched_detections = self._match_by_overlap(
+            detections, unmatched_tracks_a + tentative_tracks, unmatched_detections
+        )
+
+        # Stage 3: appearance matching for the tentative tracks the IoU gate
+        # rejected. Only genuinely unclaimed detections reach this stage: the
+        # confirmed tracks were served first by stages 1 and 2.
+        still_tentative = [i for i in tentative_tracks if i in unmatched_tracks_b]
+        matches_c, _, unmatched_detections = self._match_by_appearance(
+            detections, still_tentative, unmatched_detections
+        )
+
+        matches = matches_a + matches_b + matches_c
+        matched_tracks = {track_idx for track_idx, _ in matches}
+        unmatched_tracks = [i for i in unmatched_tracks_b if i not in matched_tracks]
+        return matches, unmatched_tracks, unmatched_detections
+
+    def _match_by_cascade(
+        self, detections: List[Detection], confirmed_tracks: List[int]
+    ) -> Tuple[List[Tuple[int, int]], List[int], List[int]]:
+        """Stage 1: cascaded appearance matching for the confirmed tracks."""
+        return matching_cascade(
             cosine_distance_matrix,
             self.max_cosine_distance,
             self.max_age,
@@ -195,20 +258,37 @@ class DeepSortTracker:
             confirmed_tracks,
         )
 
-        # Stage 2: IoU matching for unconfirmed tracks & unmatched confirmed tracks
-        iou_track_candidates = unmatched_tracks_a + unconfirmed_tracks
-        matches_b, unmatched_tracks_b, unmatched_detections = min_cost_matching(
+    def _match_by_overlap(
+        self,
+        detections: List[Detection],
+        track_indices: List[int],
+        detection_indices: List[int],
+    ) -> Tuple[List[Tuple[int, int]], List[int], List[int]]:
+        """Stage 2: spatial (IoU) matching for the tracks the cascade could not place."""
+        return min_cost_matching(
             iou_cost_matrix,
-            max_distance=0.7,  # Max 1 - IoU distance threshold
+            max_distance=self.max_iou_distance,
             tracks=self.tracks,
             detections=detections,
-            track_indices=iou_track_candidates,
-            detection_indices=unmatched_detections,
+            track_indices=track_indices,
+            detection_indices=detection_indices,
         )
 
-        matches = matches_a + matches_b
-        unmatched_tracks = unmatched_tracks_b
-        return matches, unmatched_tracks, unmatched_detections
+    def _match_by_appearance(
+        self,
+        detections: List[Detection],
+        track_indices: List[int],
+        detection_indices: List[int],
+    ) -> Tuple[List[Tuple[int, int]], List[int], List[int]]:
+        """Stage 3: appearance matching for the tentative tracks the IoU gate rejected."""
+        return min_cost_matching(
+            cosine_distance_matrix,
+            max_distance=self.max_cosine_distance,
+            tracks=self.tracks,
+            detections=detections,
+            track_indices=track_indices,
+            detection_indices=detection_indices,
+        )
 
     def _initiate_track(self, detection: Detection) -> None:
         """Create a new tentative track from unassociated detection."""
@@ -223,6 +303,7 @@ class DeepSortTracker:
             feature=detection.feature,
             class_id=detection.class_id,
             confidence=detection.confidence,
+            max_tentative_age=self.max_tentative_age,
         )
         self.tracks.append(track)
         self._next_id += 1

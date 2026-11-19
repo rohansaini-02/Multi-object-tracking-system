@@ -93,7 +93,7 @@ def draw_tracks_on_frame(
 def export_mot_results(results: List[FrameTrackingResult], output_path: str) -> None:
     """Save tracking results to disk in MOT Challenge format.
     
-    Format: frame_id, track_id, top, left, width, height, conf, -1, -1, -1
+    Format: frame_id, track_id, bb_left, bb_top, bb_width, bb_height, conf, -1, -1, -1
     (1-indexed frame numbers)
     """
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
@@ -101,7 +101,7 @@ def export_mot_results(results: List[FrameTrackingResult], output_path: str) -> 
         for res in results:
             frame_idx = res.frame_idx
             for trk in res.tracks:
-                top, left, width, height = trk.bbox.to_tlwh()
-                # MOT format: frame, id, top, left, width, height, conf, -1, -1, -1
-                line = f"{frame_idx},{trk.track_id},{top:.2f},{left:.2f},{width:.2f},{height:.2f},{trk.confidence:.4f},-1,-1,-1\n"
+                left, top, width, height = trk.bbox.to_tlwh()
+                # MOT format: frame, id, bb_left (x), bb_top (y), bb_width, bb_height, conf, -1, -1, -1
+                line = f"{frame_idx},{trk.track_id},{left:.2f},{top:.2f},{width:.2f},{height:.2f},{trk.confidence:.4f},-1,-1,-1\n"
                 f.write(line)

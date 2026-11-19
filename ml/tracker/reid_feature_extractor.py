@@ -5,6 +5,7 @@ Extracts L2-normalized feature embeddings from bounding box image crops.
 
 from typing import List, Optional, Tuple
 import logging
+import math
 import os
 import cv2
 import numpy as np
@@ -16,6 +17,39 @@ import torchvision.models as models
 from ml.types import BoundingBox, Detection
 
 logger = logging.getLogger(__name__)
+
+# Seed for the (untrained) projection layer below. No fine-tuned Re-ID
+# checkpoint ships with the project, so this layer keeps its initialised
+# weights. Without a fixed seed those weights are redrawn on every process
+# start, which changes the appearance embedding and makes the whole tracking
+# pipeline non-reproducible - the same video yields different track ids from
+# one run to the next. Seeding keeps the embedding stable while preserving
+# the exact initialisation distribution of ``nn.Linear.reset_parameters``.
+REID_PROJECTION_SEED = 20240517
+
+
+def _seeded_projection_init(fc: nn.Linear, seed: int) -> None:
+    """
+    Initialise a linear projection layer deterministically.
+
+    Mirrors ``nn.Linear.reset_parameters`` (kaiming-uniform weights, uniform
+    bias) but draws from a private generator so the result does not depend on
+    the global RNG state and is identical in every process.
+
+    Args:
+        fc: Linear layer whose parameters are re-initialised in place.
+        seed: Seed for the private random generator.
+    """
+    generator = torch.Generator().manual_seed(seed)
+    bound = 1.0 / math.sqrt(fc.in_features) if fc.in_features > 0 else 0.0
+    with torch.no_grad():
+        weight = torch.empty_like(fc.weight)
+        nn.init.kaiming_uniform_(weight, a=math.sqrt(5), generator=generator)
+        fc.weight.copy_(weight)
+        if fc.bias is not None:
+            bias = torch.empty_like(fc.bias)
+            nn.init.uniform_(bias, -bound, bound, generator=generator)
+            fc.bias.copy_(bias)
 
 
 class Net(nn.Module):
@@ -30,6 +64,7 @@ class Net(nn.Module):
         # Remove final FC layer
         self.backbone = nn.Sequential(*list(resnet.children())[:-1])
         self.fc = nn.Linear(512, reid_dim)
+        _seeded_projection_init(self.fc, REID_PROJECTION_SEED)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         feat = self.backbone(x)
