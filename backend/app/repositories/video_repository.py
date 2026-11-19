@@ -105,3 +105,20 @@ class VideoRepository:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def delete(self, video_id: str) -> bool:
+        """
+        Delete a Video record by primary key UUID.
+
+        Args:
+            video_id: UUID string of target video asset.
+
+        Returns:
+            True if deleted, False if record did not exist.
+        """
+        video = await self.get_by_id(video_id)
+        if not video:
+            return False
+        await self.session.delete(video)
+        await self.session.commit()
+        return True

@@ -65,6 +65,20 @@ class TrackingJobRepository:
         await self.session.execute(stmt)
         await self.session.commit()
 
+    async def list_by_status(self, job_status: JobStatus) -> List[TrackingJob]:
+        """
+        Return every job currently in the given lifecycle status.
+
+        Args:
+            job_status: Lifecycle status to filter on (QUEUED, PROCESSING, ...).
+
+        Returns:
+            List of matching TrackingJob entities.
+        """
+        stmt = select(TrackingJob).where(TrackingJob.status == job_status)
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
     async def list_by_user(self, user_id: str, limit: int = 20, offset: int = 0) -> List[TrackingJob]:
         stmt = (
             select(TrackingJob)
@@ -75,3 +89,11 @@ class TrackingJobRepository:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def delete(self, job_id: str) -> bool:
+        job = await self.get_by_id(job_id)
+        if not job:
+            return False
+        await self.session.delete(job)
+        await self.session.commit()
+        return True

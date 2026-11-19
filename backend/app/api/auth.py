@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.api.deps import get_current_user, get_db_session
 from backend.app.models.user import User
 from backend.app.repositories.user_repository import UserRepository
-from backend.app.schemas.auth import Token, UserCreate, UserResponse
+from backend.app.schemas.auth import GoogleLoginRequest, Token, UserCreate, UserResponse
 from backend.app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -67,6 +67,20 @@ async def login(
     user_repo = UserRepository(session)
     service = AuthService(user_repo)
     return await service.login(email=form_data.username, password=form_data.password)
+
+
+@router.post("/google", response_model=Token)
+async def login_with_google(
+    req: GoogleLoginRequest,
+    session: AsyncSession = Depends(get_db_session),
+) -> Token:
+    """
+    Authenticate user via Google ID Token, upsert user record in database,
+    and return an application JWT access token.
+    """
+    user_repo = UserRepository(session)
+    service = AuthService(user_repo)
+    return await service.login_with_google(req.credential)
 
 
 @router.get("/me", response_model=UserResponse)

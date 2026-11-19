@@ -11,7 +11,7 @@ Architectural Role:
 """
 
 from typing import List
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.api.deps import get_current_user, get_db_session
@@ -92,3 +92,25 @@ async def get_video(
     video_repo = VideoRepository(session)
     service = VideoService(video_repo)
     return await service.get_video(video_id, current_user.id)
+
+
+@router.delete("/{video_id}", status_code=status.HTTP_200_OK)
+async def delete_video(
+    video_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """
+    Delete a video asset, its uploaded disk file, and cascade delete associated tracking jobs.
+
+    Args:
+        video_id: UUID of video to delete.
+        current_user: Authenticated User entity resolved from JWT bearer token.
+        session: Injected async database session context.
+
+    Returns:
+        Confirmation dictionary with deleted video ID.
+    """
+    video_repo = VideoRepository(session)
+    service = VideoService(video_repo)
+    return await service.delete_video(video_id, current_user.id)

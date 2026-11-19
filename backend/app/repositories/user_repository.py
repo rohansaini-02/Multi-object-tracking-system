@@ -74,3 +74,44 @@ class UserRepository:
         await self.session.commit()
         await self.session.refresh(user)
         return user
+
+    async def create_oauth_user(
+        self,
+        email: str,
+        google_id: str,
+        full_name: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+        auth_provider: str = "google",
+    ) -> User:
+        """
+        Persist a new OAuth-authenticated User without requiring a password hash.
+        """
+        user = User(
+            email=email.lower(),
+            hashed_password=None,
+            full_name=full_name,
+            google_id=google_id,
+            avatar_url=avatar_url,
+            auth_provider=auth_provider,
+        )
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
+
+    async def link_google_account(
+        self,
+        user: User,
+        google_id: str,
+        avatar_url: Optional[str] = None,
+    ) -> User:
+        """
+        Link an existing user account with Google OAuth credentials.
+        """
+        if not user.google_id:
+            user.google_id = google_id
+        if avatar_url and not user.avatar_url:
+            user.avatar_url = avatar_url
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user

@@ -21,6 +21,10 @@ from backend.app.core.config import settings
 from backend.app.models.video import Video
 from backend.app.repositories.video_repository import VideoRepository
 from backend.app.schemas.video import VideoResponse
+from backend.app.services.job_artifact_service import (
+    build_artifact_paths,
+    build_artifact_temp_paths,
+)
 
 ALLOWED_EXTENSIONS = {".mp4", ".avi", ".mov", ".mkv"}
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB limit
@@ -80,8 +84,10 @@ class VideoService:
             HTTPException 413: If file total byte size exceeds MAX_FILE_SIZE (500MB).
             HTTPException 500: If disk write operation fails.
         """
-        filename = file.filename or "video.mp4"
-        ext = os.path.splitext(filename)[1].lower()
+        raw_filename = file.filename or "video.mp4"
+        # Sanitize filename against path traversal attacks
+        safe_filename = os.path.basename(raw_filename.replace("\\", "/")).strip() or "video.mp4"
+        ext = os.path.splitext(safe_filename)[1].lower()
 
         if ext not in ALLOWED_EXTENSIONS:
             raise HTTPException(
@@ -90,8 +96,16 @@ class VideoService:
             )
 
         os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        dest_path = os.path.join(settings.UPLOAD_DIR, unique_filename)
+        unique_filename = f"{uuid.uuid4().hex}_{safe_filename}"
+        dest_path = os.path.abspath(os.path.join(settings.UPLOAD_DIR, unique_filename))
+
+        # Enforce that destination stays strictly inside UPLOAD_DIR
+        upload_root = os.path.abspath(settings.UPLOAD_DIR)
+        if not dest_path.startswith(upload_root):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid destination filename path.",
+            )
 
         # Write uploaded file stream to disk in 1MB chunks
         file_size = 0
@@ -122,7 +136,7 @@ class VideoService:
 
         video = await self.video_repo.create(
             user_id=user_id,
-            filename=filename,
+            filename=safe_filename,
             file_path=dest_path,
             file_size=file_size,
             duration=duration,
@@ -168,3 +182,51 @@ class VideoService:
         """
         videos = await self.video_repo.list_by_user(user_id)
         return [VideoResponse.model_validate(v) for v in videos]
+
+    async def delete_video(self, video_id: str, user_id: str) -> dict:
+        """
+        Delete a Video asset record, clean up its disk file, and cascade delete associated jobs.
+
+        Args:
+            video_id: Target video UUID string.
+            user_id: UUID of requesting user (ownership check).
+
+        Returns:
+            Status dictionary confirming deletion.
+
+        Raises:
+            HTTPException 404: If video is not found or does not belong to user.
+        """
+        video = await self.video_repo.get_by_id(video_id)
+        if not video or video.user_id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Video '{video_id}' not found.",
+            )
+
+        # Remove physical video file from disk
+        if video.file_path and os.path.isfile(video.file_path):
+            try:
+                os.remove(video.file_path)
+            except OSError:
+                pass
+
+        # Purge physical disk artifacts for any associated tracking jobs
+        if hasattr(video, "tracking_jobs") and video.tracking_jobs:
+            for job in video.tracking_jobs:
+                paths = build_artifact_paths(job.id)
+                temp_paths = build_artifact_temp_paths(job.id)
+                for path in [
+                    paths.get("annotated_video_path"),
+                    paths.get("output_mot_path"),
+                    temp_paths.get("annotated_video_path"),
+                    temp_paths.get("output_mot_path"),
+                ]:
+                    if path and os.path.isfile(path):
+                        try:
+                            os.remove(path)
+                        except OSError:
+                            pass
+
+        await self.video_repo.delete(video_id)
+        return {"status": "deleted", "video_id": video_id}

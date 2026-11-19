@@ -72,11 +72,58 @@ class AuthService:
             HTTPException 401 Unauthorized: If email is not found or password verification fails.
         """
         user = await self.user_repo.get_by_email(email)
-        if not user or not verify_password(password, user.hashed_password):
+        if not user or not user.hashed_password or not verify_password(password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        token_str = create_access_token(subject=user.id)
+        return Token(access_token=token_str, token_type="bearer")
+
+    async def login_with_google(self, credential: str) -> Token:
+        """
+        Verify Google ID token, upsert user account, and issue application JWT access token.
+        """
+        from modules.google_auth.verifier import (
+            GoogleTokenVerifier,
+            InvalidTokenError,
+            ExpiredTokenError,
+            InvalidAudienceError,
+            EmailNotVerifiedError,
+        )
+        from backend.app.core.config import settings
+
+        verifier = GoogleTokenVerifier(client_id=settings.GOOGLE_CLIENT_ID)
+        try:
+            profile = verifier.verify_token(credential)
+        except ExpiredTokenError as err:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(err))
+        except (InvalidAudienceError, InvalidTokenError) as err:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(err))
+        except EmailNotVerifiedError as err:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(err))
+        except Exception as err:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Google authentication error: {err}")
+
+        # Look up existing user by email
+        user = await self.user_repo.get_by_email(profile.email)
+        if user:
+            # Link Google account if not linked yet
+            user = await self.user_repo.link_google_account(
+                user=user,
+                google_id=profile.sub,
+                avatar_url=profile.picture,
+            )
+        else:
+            # Auto-create new user
+            user = await self.user_repo.create_oauth_user(
+                email=profile.email,
+                google_id=profile.sub,
+                full_name=profile.name,
+                avatar_url=profile.picture,
+                auth_provider="google",
             )
 
         token_str = create_access_token(subject=user.id)

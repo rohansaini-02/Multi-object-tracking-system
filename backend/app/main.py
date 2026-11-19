@@ -1,5 +1,5 @@
 """
-FastAPI Main Application Entry Point.
+FastAPI Main Application Entry Point (with Google OAuth 2.0 & MOT Pipeline).
 """
 
 import os
@@ -10,13 +10,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.api.auth import router as auth_router
+from backend.app.api.benchmark import router as benchmark_router
 from backend.app.api.health import router as health_router
 from backend.app.api.jobs import router as jobs_router
 from backend.app.api.video import router as video_router
 from backend.app.core.config import settings
 from backend.app.db import database
 from backend.app.db.database import Base
-import backend.app.models  # Ensure models are imported for metadata registration
+from backend.app.services.job_service import recover_orphaned_jobs
+import backend.app.models as _models  # noqa: F401
 
 logger = logging.getLogger("uvicorn")
 
@@ -39,6 +41,20 @@ async def lifespan(app: FastAPI):
                 await conn.run_sync(Base.metadata.create_all)
         else:
             raise exc
+
+    # Tracking jobs run in a worker process that does not survive a restart, so
+    # anything still marked as queued or processing can never finish. Fail it
+    # explicitly instead of leaving the operator with a frozen progress bar.
+    try:
+        orphaned = await recover_orphaned_jobs()
+        if orphaned:
+            logger.warning(
+                "[JOB RECOVERY] Marked %s orphaned job(s) as FAILED after startup.",
+                orphaned,
+            )
+    except Exception as exc:
+        logger.warning("[JOB RECOVERY] Could not reconcile orphaned jobs: %s", exc)
+
     yield
 
 
@@ -53,7 +69,13 @@ app = FastAPI(
 # Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,6 +90,7 @@ app.include_router(health_router, prefix=settings.API_V1_STR)
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(video_router, prefix=settings.API_V1_STR)
 app.include_router(jobs_router, prefix=settings.API_V1_STR)
+app.include_router(benchmark_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")

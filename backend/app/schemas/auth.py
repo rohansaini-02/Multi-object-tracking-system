@@ -61,11 +61,21 @@ class UserResponse(BaseModel):
         email: Registered email address.
         full_name: Display name or None.
         is_active: Flag indicating whether account is active.
+        auth_provider: Authentication provider ('local' or 'google').
+        avatar_url: Profile avatar URL (if provided by OAuth).
     """
 
     id: str = Field(..., description="Unique UUID identifier for the user.")
     email: EmailStr = Field(..., description="Registered email address.")
     full_name: Optional[str] = Field(None, description="User's full display name.")
     is_active: bool = Field(True, description="Account active status flag.")
+    auth_provider: Optional[str] = Field("local", description="Account provider type.")
+    avatar_url: Optional[str] = Field(None, description="User profile picture URL.")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class GoogleLoginRequest(BaseModel):
+    """Payload sent by client when authenticating with Google ID Token."""
+    credential: str = Field(..., description="Google ID Token JWT string returned by Google Identity Services.")
+    client_id: Optional[str] = Field(None, description="Google OAuth Client ID.")

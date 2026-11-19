@@ -4,7 +4,14 @@ Reads environment variables from root or backend .env file.
 """
 
 from typing import List, Optional
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Sanitize corrupted machine-level CA bundle paths (e.g. broken PostgreSQL ca-bundle.crt)
+for ca_var in ("CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE", "SSL_CERT_FILE"):
+    ca_val = os.environ.get(ca_var)
+    if ca_val and not os.path.isfile(ca_val):
+        os.environ.pop(ca_var, None)
 
 
 class Settings(BaseSettings):
@@ -32,6 +39,10 @@ class Settings(BaseSettings):
     YOLO_MODEL_PATH: str = "weights/yolov8m.pt"
     REID_BASE_WEIGHTS_PATH: str = "weights/reid_base.pth"
     REID_FINETUNED_WEIGHTS_PATH: str = "weights/reid_fine_tuned.pth"
+
+    # Google OAuth (loaded from .env or environment variables)
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
