@@ -1,25 +1,44 @@
-import React from 'react';
-import { 
-  LayoutDashboard, 
-  Eye, 
-  UploadCloud, 
-  BarChart3, 
-  History, 
-  Settings, 
-  Target, 
+import {
+  LayoutDashboard,
+  Eye,
+  UploadCloud,
+  BarChart3,
+  History,
+  Settings,
   LogOut,
-  Star
+  Star,
+  Cpu,
+  Crosshair
 } from 'lucide-react';
 
-export default function Sidebar({ activePage, setActivePage }) {
+export default function Sidebar({ activePage, setActivePage, user, onLogout }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'workspace', label: 'Tracking Viewer', icon: Eye, star: true },
     { id: 'ingest', label: 'Upload Video', icon: UploadCloud },
+    { id: 'workspace', label: 'Tracking Viewer', icon: Eye, star: true },
+    { id: 'training', label: 'Model Training', icon: Cpu },
     { id: 'benchmark', label: 'MOT17 Benchmark', icon: BarChart3 },
-    { id: 'history', label: 'History', icon: History, badge: '2' },
+    { id: 'history', label: 'History', icon: History },
     { id: 'config', label: 'Settings', icon: Settings },
   ];
+
+  // Identity is derived from the authenticated session when one is available.
+  const displayName = user?.full_name || user?.email || 'Guest Operator';
+  const displayEmail = user?.email || 'not signed in';
+  const initials = displayName
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('') || 'GO';
+
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+    } else if (setActivePage) {
+      setActivePage('login');
+    }
+  };
 
   return (
     <aside style={{
@@ -41,8 +60,9 @@ export default function Sidebar({ activePage, setActivePage }) {
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px'
+          gap: '12px',
         }}>
+          {/* Logo icon box (not clickable) */}
           <div style={{
             width: '32px',
             height: '32px',
@@ -54,24 +74,69 @@ export default function Sidebar({ activePage, setActivePage }) {
             justifyContent: 'center',
             fontSize: '1rem',
             color: 'var(--accent-cyan)',
-            boxShadow: '0 0 10px rgba(0, 229, 255, 0.2)'
+            boxShadow: '0 0 10px rgba(0, 229, 255, 0.2)',
+            flexShrink: 0,
+            userSelect: 'none',
           }}>
-            ⌖
+            <Crosshair size={16} />
           </div>
-          <div>
-            <div style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              color: 'var(--text-primary)',
-              letterSpacing: '0.04em',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              Multi-Object Tracker <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--text-muted)', background: 'var(--bg-elevated)', padding: '1px 4px', borderRadius: '3px' }}>v0.1.0</span>
+
+          {/* Only the text is clickable */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setActivePage?.('dashboard')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setActivePage?.('dashboard');
+              }
+            }}
+            title="Return to Dashboard"
+            style={{
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                color: 'var(--text-primary)',
+                letterSpacing: '0.04em',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'color 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+            >
+              Multi-Object Tracker{' '}
+              <span
+                className="font-mono"
+                style={{
+                  fontSize: '0.6rem',
+                  color: 'var(--text-muted)',
+                  background: 'var(--bg-elevated)',
+                  padding: '1px 4px',
+                  borderRadius: '3px',
+                }}
+              >
+                v0.1.0
+              </span>
             </div>
-            <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--accent-cyan)', letterSpacing: '0.04em', marginTop: '3px', fontWeight: 600 }}>
+            <div
+              className="font-mono"
+              style={{
+                fontSize: '0.6rem',
+                color: 'var(--accent-cyan)',
+                letterSpacing: '0.04em',
+                marginTop: '3px',
+                fontWeight: 600,
+              }}
+            >
               DETECTION & TRACKING PLATFORM
             </div>
           </div>
@@ -152,33 +217,49 @@ export default function Sidebar({ activePage, setActivePage }) {
         justify: 'space-between'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--bg-elevated)',
-            border: '1px solid var(--border-strong)',
-            display: 'flex',
-            alignItems: 'center',
-            justify: 'center',
-            fontSize: '0.8rem',
-            fontWeight: 700,
-            color: 'var(--accent-cyan)'
-          }}>
-            AM
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whitespace: 'nowrap' }}>
-              Dr. Alex Mercer
+          {user?.avatar_url || user?.picture ? (
+            <img
+              src={user.avatar_url || user.picture}
+              alt={displayName}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                border: '1.5px solid var(--accent-cyan)',
+                objectFit: 'cover',
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--bg-elevated)',
+              border: '1px solid var(--border-strong)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: 'var(--accent-cyan)',
+              flexShrink: 0,
+            }}>
+              {initials}
             </div>
-            <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whitespace: 'nowrap' }}>
-              alex.mercer@visionops...
+          )}
+          <div style={{ overflow: 'hidden' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              {displayName}
+            </div>
+            <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              {displayEmail}
             </div>
           </div>
         </div>
-        <button 
-          onClick={() => setActivePage('login')}
-          title="Switch Account / Login"
+        <button
+          onClick={handleLogoutClick}
+          title="Sign Out"
           style={{
             background: 'none',
             border: 'none',

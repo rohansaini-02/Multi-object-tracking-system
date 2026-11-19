@@ -1,4 +1,5 @@
 import React from 'react';
+import { Film } from 'lucide-react';
 
 export default function ResultsViewer() {
   return (
@@ -20,7 +21,9 @@ export default function ResultsViewer() {
             justifyContent: 'center',
             color: 'var(--text-muted)',
           }}>
-            <span>🎥 Video playback will render here when job completes</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Film size={18} color="var(--accent-cyan)" /> Video playback will render here when job completes
+            </span>
           </div>
         </div>
 

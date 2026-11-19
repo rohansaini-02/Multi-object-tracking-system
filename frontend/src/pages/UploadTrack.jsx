@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { FolderPlus, Rocket } from 'lucide-react';
 
 export default function UploadTrack() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -27,7 +28,9 @@ export default function UploadTrack() {
             background: 'rgba(99, 102, 241, 0.03)',
             cursor: 'pointer',
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📁</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: 'var(--accent-cyan)' }}>
+              <FolderPlus size={44} />
+            </div>
             <h4 style={{ marginBottom: '8px' }}>
               {selectedFile ? selectedFile.name : 'Drag and drop video file here'}
             </h4>
@@ -82,10 +85,10 @@ export default function UploadTrack() {
 
           <button
             className="btn-primary"
-            style={{ width: '100%', justifyContent: 'center' }}
+            style={{ width: '100%', justifyContent: 'center', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             disabled={!selectedFile}
           >
-            Start Tracking Job 🚀
+            <Rocket size={14} /> Start Tracking Job
           </button>
         </div>
       </div>

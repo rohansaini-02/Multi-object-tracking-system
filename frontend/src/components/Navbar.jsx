@@ -1,4 +1,5 @@
 import React from 'react';
+import { Crosshair } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage }) {
   const navItems = [
@@ -17,7 +18,7 @@ export default function Navbar({ activePage, setActivePage }) {
         onClick={() => setActivePage('home')}
         style={{ cursor: 'pointer' }}
       >
-        <span style={{ fontSize: '1.5rem' }}>🎯</span>
+        <Crosshair size={22} color="var(--accent-cyan)" />
         <span>TrackPulse MOT</span>
       </div>
       

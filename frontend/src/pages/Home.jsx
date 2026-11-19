@@ -1,4 +1,4 @@
-import React from 'react';
+import { Rocket, BarChart2, Zap, Crosshair, TrendingUp } from 'lucide-react';
 
 export default function Home({ setActivePage }) {
   return (
@@ -14,18 +14,30 @@ export default function Home({ setActivePage }) {
           Real-time and offline pedestrian detection, trajectory tracking, and MOT17 benchmark evaluation powered by FastAPI and DeepSORT.
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <button className="btn-primary" onClick={() => setActivePage('upload')}>
-            Launch Tracker 🚀
+          <button
+            className="btn-primary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            onClick={() => setActivePage?.('ingest')}
+          >
+            <Rocket size={16} />
+            <span>Launch Tracker</span>
           </button>
-          <button className="btn-secondary" onClick={() => setActivePage('benchmark')}>
-            View MOT17 Benchmarks 📊
+          <button
+            className="btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            onClick={() => setActivePage?.('benchmark')}
+          >
+            <BarChart2 size={16} />
+            <span>View MOT17 Benchmarks</span>
           </button>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⚡</div>
+          <div style={{ marginBottom: '12px' }}>
+            <Zap size={28} color="var(--accent-cyan)" />
+          </div>
           <h3 style={{ marginBottom: '8px' }}>Sub-300ms Interactive API</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             FastAPI async backend for lightning-fast job status polling and real-time frame progress updates.
@@ -33,7 +45,9 @@ export default function Home({ setActivePage }) {
         </div>
 
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🎯</div>
+          <div style={{ marginBottom: '12px' }}>
+            <Crosshair size={28} color="var(--accent-cyan)" />
+          </div>
           <h3 style={{ marginBottom: '8px' }}>YOLOv8 + Re-ID DeepSORT</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             Combines Kalman motion filter with PyTorch L2-normalized appearance embeddings to prevent identity switches.
@@ -41,7 +55,9 @@ export default function Home({ setActivePage }) {
         </div>
 
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📈</div>
+          <div style={{ marginBottom: '12px' }}>
+            <TrendingUp size={28} color="var(--accent-cyan)" />
+          </div>
           <h3 style={{ marginBottom: '8px' }}>MOT17 Protocol Evaluation</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             Compute MOTA, IDF1, and ID Switch metrics against MOT17 ground truth annotations.
