@@ -164,7 +164,7 @@ ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES=10080
 
 # Database & Redis Settings
-DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/mot_db"
+DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/multi_object_tracking_db"
 REDIS_URL="redis://localhost:6379/0"
 
 # Path Configs
