@@ -13,6 +13,15 @@ ENV/
 .env
 .env.local
 
+# Local databases
+*.db
+*.sqlite3
+
+# Test artifacts and tool metadata
+*.mp4
+test_out.mp4
+.opencode/
+
 # ML Weights & Datasets
 weights/*.pt
 weights/*.t7
@@ -28,6 +37,7 @@ data/mot17/*
 !data/mot17/.gitkeep
 data/*.avi
 data/*.mp4
+data/*.log
 
 # IDEs
 .vscode/
